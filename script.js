@@ -62,7 +62,8 @@ function addBookToLibrary(name, author, pages, read) {
 
 const renderSingleCard = (i) => {
     const card = document.createElement('div');
-    card.classList.add('card', `card-${i}`);
+    card.classList.add('card');
+    card.dataset.id = myLibrary[i].id;
     const name = document.createElement('h2');
     name.classList.add('name');
     const author = document.createElement('h3');
@@ -73,10 +74,10 @@ const renderSingleCard = (i) => {
     cardButtons.classList.add('card-buttons');
     const delBtn = document.createElement('button');
     delBtn.classList.add('del-button');
-    delBtn.dataset.index = i;
+    delBtn.dataset.id = myLibrary[i].id;
     const toggleBtn = document.createElement('button');
     toggleBtn.classList.add('toggle-button');
-    toggleBtn.dataset.index = i;
+    toggleBtn.dataset.id = myLibrary[i].id;
     const read = document.createElement('h5');
     
     if (myLibrary[i].read) {
@@ -108,7 +109,7 @@ const renderLibrary = () => {
         library.textContent = 'No books to show here';
     }
     else if (myLibrary.length > 0) {
-        library.textContent = '';
+        library.innerHTML = '';
         for (let i = 0; i <= myLibrary.length - 1; i++) {
             renderSingleCard(i);
         }
@@ -118,17 +119,26 @@ const renderLibrary = () => {
 library.addEventListener('click', (e) => {
     if (e.target.classList.contains('del-button')) {
         e.preventDefault();
-        const indexToDelete = e.target.dataset.index;
+        const idToDelete = e.target.dataset.id;
+        const indexToDelete = myLibrary.findIndex((book) => book.id === idToDelete);
+
+        if (indexToDelete === -1) {
+            return;
+        }
 
         myLibrary.splice(indexToDelete, 1);
+        document.querySelector(`.card[data-id="${idToDelete}"]`).remove();
 
-        library.innerHTML = '';
-        renderLibrary();
     } else if (e.target.classList.contains('toggle-button')) {
         e.preventDefault();
 
-        const indexToToggle = e.target.dataset.index;
-        const read = document.querySelector(`.card-${indexToToggle} .read-status`);
+        const idToToggle = e.target.dataset.id;
+        const indexToToggle = myLibrary.findIndex((book) => book.id == idToToggle);
+        const read = document.querySelector(`.card[data-id="${idToToggle}"] .read-status`);
+
+        if (indexToToggle === -1) {
+            return;
+        }
 
         if (!myLibrary[indexToToggle].read) {
             myLibrary[indexToToggle].read = true;
